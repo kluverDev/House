@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { IResolvers } from "apollo-server-express";
 import { ObjectId } from "mongodb";
-import { Database, Listing} from "../lib/types";
+import { Database, Listing} from "../../../lib/types";
 
-export const resolvers: IResolvers = {
+export const listingResolvers: IResolvers = {
   Query: {
     // eslint-disable-next-line @typescript-eslint/ban-types
     listings: async (_root: undefined, _args: {}, { db }: { db: Database }): Promise<Listing[]>  => {
