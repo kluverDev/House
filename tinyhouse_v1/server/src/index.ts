@@ -1,10 +1,15 @@
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require("dotenv").config();
+
 import express, { Application } from "express";
 import { ApolloServer } from "apollo-server-express";
 import { connectDatabase } from "./database";
 
 import { typeDefs, resolvers } from "./graphql";
 
-const port = 9000;
+const port = process.env.PORT;
+console.log(process.env.DB_USER_PASSWORD)
 
 const mount = async (app: Application) => {
   const db = await connectDatabase();
