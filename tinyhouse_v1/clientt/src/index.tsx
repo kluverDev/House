@@ -4,7 +4,7 @@ import { Listings } from "./sections";
 import reportWebVitals from './reportWebVitals';
 
 
-render(<Listings />, document.getElementById("root"));
+render(<Listings title= "Listings component" />, document.getElementById("root"));
 
 
 // If you want to start measuring performance in your app, pass a function
