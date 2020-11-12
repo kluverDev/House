@@ -1,9 +1,12 @@
-interface Body {
+//variables? means variables feed is optional because not every request need variables
+interface Body <TVariables>{
     query: string;
+    variables?: TVariables;
 }
 
 export const server = {
-    fetch: async <TData = any>(body: Body) => {
+    //TData and TVariables defaults to the any type if no type is passed
+    fetch: async <TData = any, TVariables = any>(body: Body<TVariables>) => {
         console.log("eight")
 
         const res = await fetch("/api", {
