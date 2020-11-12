@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { server } from "../../lib/api";
 import {
   DeleteListingData,
   DeleteListingVariables,
   ListingsData,
+  Listing,
 } from "./types";
 
 const LISTINGS = `
@@ -35,33 +36,54 @@ interface Props {
 }
 
 export const Listings = ({ title }: Props) => {
+  console.log("IN LISTING FUNCTION");
+
+  const [listings, setListings] = useState<Listing[] | null>(null);
+
   const fetchListings = async () => {
-    console.log("one");
+    console.log("IN FETCH LISTING FUNC");
     const { data } = await server.fetch<ListingsData>({ query: LISTINGS });
-    console.log("two");
+    console.log("FETCH LISTING DONE");
+    console.log("STATE UPDATED");
+    setListings(data.listings);
     console.log(data); // check the console to see the listings data from our GraphQL Request!
-    console.log("three");
+    //console.log("three");
   };
 
-  const deleteListing = async () => {
+  const deleteListing = async (id: string) => {
+    console.log("IN DELETE LISTING FUNC");
     const { data } = await server.fetch<
       DeleteListingData,
       DeleteListingVariables
     >({
       query: DELETE_LISTING,
       variables: {
-        id: "5f9cc1a00d0aa2398f12b0e8",
+        id,
       },
     });
-    console.log(data, "deleted data")
+    console.log(data, "deleted data");
+
+    fetchListings();
   };
-  console.log("body");
+
+  const listingslist = (
+    <ul>
+      {listings?.map((listing) => {
+        return (
+          <li key={listing.id}>
+            {listing.title}{" "}
+            <button onClick={() => deleteListing(listing.id)}> Delete</button>
+          </li>
+        );
+      })}
+    </ul>
+  );
 
   return (
     <div>
       <h2>{title}</h2>
+      {listingslist}
       <button onClick={fetchListings}>Query Listings!</button>
-      <button onClick={deleteListing}>Delete Listing</button>
     </div>
   );
 };

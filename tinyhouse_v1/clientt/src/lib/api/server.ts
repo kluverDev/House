@@ -7,7 +7,7 @@ interface Body <TVariables>{
 export const server = {
     //TData and TVariables defaults to the any type if no type is passed
     fetch: async <TData = any, TVariables = any>(body: Body<TVariables>) => {
-        console.log("eight")
+        console.log("IN SERVER FUNCTION")
 
         const res = await fetch("/api", {
             method: "POST",
@@ -16,8 +16,9 @@ export const server = {
             },
             body: JSON.stringify(body)
         });
-        console.log(res, "res")
-        console.log(res.json, "res.json")
+        
+        console.log("RETURNING JSON FROM SERVER FUNCTION")
+        
 
         return res.json() as Promise<{data: TData}>;
     }
