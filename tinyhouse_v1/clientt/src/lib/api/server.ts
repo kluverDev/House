@@ -3,7 +3,7 @@ interface Body {
 }
 
 export const server = {
-    fetch: async (body: Body) => {
+    fetch: async <TData = any>(body: Body) => {
         console.log("eight")
 
         const res = await fetch("/api", {
@@ -16,6 +16,6 @@ export const server = {
         console.log(res, "res")
         console.log(res.json, "res.json")
 
-        return res.json();
+        return res.json() as Promise<{data: TData}>;
     }
 }
