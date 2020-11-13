@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { server } from "../../lib/api";
 import {
   DeleteListingData,
@@ -40,13 +40,17 @@ export const Listings = ({ title }: Props) => {
 
   const [listings, setListings] = useState<Listing[] | null>(null);
 
+  useEffect(() => {
+    fetchListings();
+  }, []);
+
   const fetchListings = async () => {
     console.log("IN FETCH LISTING FUNC");
     const { data } = await server.fetch<ListingsData>({ query: LISTINGS });
     console.log("FETCH LISTING DONE");
     console.log("STATE UPDATED");
     setListings(data.listings);
-    console.log(data); // check the console to see the listings data from our GraphQL Request!
+    console.log(data, " fetched data"); // check the console to see the listings data from our GraphQL Request!
     //console.log("three");
   };
 
@@ -83,7 +87,6 @@ export const Listings = ({ title }: Props) => {
     <div>
       <h2>{title}</h2>
       {listingslist}
-      <button onClick={fetchListings}>Query Listings!</button>
     </div>
   );
 };
