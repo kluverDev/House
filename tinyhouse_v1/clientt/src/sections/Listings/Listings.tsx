@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { server } from "../../lib/api";
+import { server, useQuery } from "../../lib/api";
 import {
   DeleteListingData,
   DeleteListingVariables,
-  ListingsData,
-  Listing,
+  ListingsData
 } from "./types";
 
 const LISTINGS = `
@@ -37,22 +36,7 @@ interface Props {
 
 export const Listings = ({ title }: Props) => {
   console.log("IN LISTING FUNCTION");
-
-  const [listings, setListings] = useState<Listing[] | null>(null);
-
-  useEffect(() => {
-    fetchListings();
-  }, []);
-
-  const fetchListings = async () => {
-    console.log("IN FETCH LISTING FUNC");
-    const { data } = await server.fetch<ListingsData>({ query: LISTINGS });
-    console.log("FETCH LISTING DONE");
-    console.log("STATE UPDATED");
-    setListings(data.listings);
-    console.log(data, " fetched data"); // check the console to see the listings data from our GraphQL Request!
-    //console.log("three");
-  };
+  const { data } = useQuery<ListingsData>(LISTINGS);
 
   const deleteListing = async (id: string) => {
     console.log("IN DELETE LISTING FUNC");
@@ -66,9 +50,8 @@ export const Listings = ({ title }: Props) => {
       },
     });
     console.log(data, "deleted data");
-
-    fetchListings();
   };
+  const listings = data ? data.listings : null;
 
   const listingslist = (
     <ul>
