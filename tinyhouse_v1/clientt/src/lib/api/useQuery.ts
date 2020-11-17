@@ -1,4 +1,3 @@
-import { error } from "console";
 import { useState, useEffect, useCallback } from "react";
 import { server } from "./server";
 
@@ -8,7 +7,11 @@ interface State<TData> {
   error: boolean;
 }
 
-export const useQuery = <TData = any>(query: string) => {
+interface QueryResult<TData> extends State<TData> {
+  refetch: () => void;
+}
+
+export const useQuery = <TData = any>(query: string): QueryResult<TData> => {
   const [state, setState] = useState<State<TData>>({
     data: null,
     loading: false,
