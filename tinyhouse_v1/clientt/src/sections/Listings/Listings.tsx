@@ -36,7 +36,7 @@ interface Props {
 
 export const Listings = ({ title }: Props) => {
   console.log("IN LISTING FUNCTION");
-  const { data, refetch } = useQuery<ListingsData>(LISTINGS);
+  const { data, loading, error, refetch } = useQuery<ListingsData>(LISTINGS);
 
   const deleteListing = async (id: string) => {
     console.log("IN DELETE LISTING FUNC");
@@ -54,6 +54,12 @@ export const Listings = ({ title }: Props) => {
     console.log(data, "deleted data");
   };
   const listings = data ? data.listings : null;
+  if (loading) {
+    return <h2>Loading.....</h2>;
+  }
+  if (error) {
+    return <h2>Uh oh! Something went wrong - please try again later :(</h2>;
+  }
 
   const listingslist = (
     <ul>

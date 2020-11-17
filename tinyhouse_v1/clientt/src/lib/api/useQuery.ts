@@ -1,26 +1,48 @@
+import { error } from "console";
 import { useState, useEffect, useCallback } from "react";
 import { server } from "./server";
 
 interface State<TData> {
   data: TData | null;
+  loading: boolean;
+  error: boolean;
 }
 
 export const useQuery = <TData = any>(query: string) => {
-  const [state, setState] = useState<State<TData>>({ data: null });
+  const [state, setState] = useState<State<TData>>({
+    data: null,
+    loading: false,
+    error: false,
+  });
   console.log("in usequery");
 
   const fetch = useCallback(() => {
     const fetchApi = async () => {
-      const { data } = await server.fetch<TData>({
-        query,
-      });
-      console.log("before setstate fetchApi usecallback");
+      try {
+        setState({ data: null, loading: true, error: false });
+        const { data, errors } = await server.fetch<TData>({
+          query,
+        });
+        console.log("before setstate fetchApi usecallback");
+        if (errors && errors.length) {
+            throw new Error(errors[0].message);
 
-      setState({ data });
-      console.log("After setstate fetchApi usecallback");
+          }
+  
+        setState({ data, loading: false, error: false });
+        console.log("After setstate fetchApi usecallback");
+
+        console.log("in use callbackk");
+      } catch (err){
+        setState({
+          data: null,
+          loading: false,
+          error: true,
+        });
+        throw console.error(err,"hi");
+
+      }
     };
-    console.log("in use callbackk");
-
     fetchApi();
   }, [query]);
 
