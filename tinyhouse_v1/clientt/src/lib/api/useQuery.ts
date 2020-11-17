@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { server } from "./server";
 
 interface State<TData> {
@@ -7,19 +7,28 @@ interface State<TData> {
 
 export const useQuery = <TData = any>(query: string) => {
   const [state, setState] = useState<State<TData>>({ data: null });
-  console.log("in usequery")
+  console.log("in usequery");
 
-  useEffect(() => {
-      console.log("usequerry useeffect")
+  const fetch = useCallback(() => {
     const fetchApi = async () => {
-      const { data } = await server.fetch<TData>({ query });
-      console.log('before fetch api set state')
+      const { data } = await server.fetch<TData>({
+        query,
+      });
+      console.log("before setstate fetchApi usecallback");
 
       setState({ data });
-      console.log('after fetch api set state')
+      console.log("After setstate fetchApi usecallback");
     };
+    console.log("in use callbackk");
+
     fetchApi();
   }, [query]);
-  console.log("before eturn state")
-  return state;
+
+  useEffect(() => {
+    console.log("usequerry useeffect");
+
+    fetch();
+  }, [fetch]);
+  console.log("before eturn state");
+  return { ...state, refetch: fetch };
 };

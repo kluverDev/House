@@ -3,7 +3,7 @@ import { server, useQuery } from "../../lib/api";
 import {
   DeleteListingData,
   DeleteListingVariables,
-  ListingsData
+  ListingsData,
 } from "./types";
 
 const LISTINGS = `
@@ -36,7 +36,7 @@ interface Props {
 
 export const Listings = ({ title }: Props) => {
   console.log("IN LISTING FUNCTION");
-  const { data } = useQuery<ListingsData>(LISTINGS);
+  const { data, refetch } = useQuery<ListingsData>(LISTINGS);
 
   const deleteListing = async (id: string) => {
     console.log("IN DELETE LISTING FUNC");
@@ -49,6 +49,8 @@ export const Listings = ({ title }: Props) => {
         id,
       },
     });
+    refetch();
+
     console.log(data, "deleted data");
   };
   const listings = data ? data.listings : null;
