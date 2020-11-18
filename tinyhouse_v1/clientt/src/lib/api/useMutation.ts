@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useReducer } from "react";
 import { server } from "./server";
 
 interface State<TData> {
@@ -7,39 +7,58 @@ interface State<TData> {
   error: boolean;
 }
 
-
-
 type MutationTuple<TData, TVariables> = [
     (variables?: TVariables | undefined) => Promise<void>,
     State<TData>
   ];
 
-export const useMutation = <TData = any, TVariables = any>(query: string): MutationTuple<TData, TVariables> => {
-  const [state, setState] = useState<State<TData>>({
-    data: null,
-    loading: false,
-    error: false,
-  });
+  type Action<TData> =
+  | { type: "FETCH" }
+  | { type: "FETCH_SUCCESS"; payload: TData }
+  | { type: "FETCH_ERROR" };
 
-  const fetch = async (variables?: TVariables) => {
-    try {
-      setState({ data: null, loading: true, error: false });
-
-      const { data, errors } = await server.fetch<TData, TVariables>({
-        query,
-        variables
-      });
-
-      if (errors && errors.length) {
-        throw new Error(errors[0].message);
-      }
-
-      setState({ data, loading: false, error: false });
-    } catch (err) {
-      setState({ data: null, loading: false, error: true });
-      throw console.error(err);
+  const reducer = <TData>() => (state: State<TData>, action: Action<TData>) => {
+    switch (action.type) {
+      case "FETCH":
+        return { ...state, loading: true };
+      case "FETCH_SUCCESS":
+        return { ...state, data: action.payload, loading: false, error: false };
+      case "FETCH_ERROR":
+        return { ...state, loading: false, error: true };
+      default:
+        throw new Error();
     }
   };
 
-  return [fetch, state];
-};
+  export const useMutation = <TData, TVariables = {}>(
+    query: string
+  ): MutationTuple<TData, TVariables> => {
+    const fetchReducer = reducer<TData>();
+    const [state, dispatch] = useReducer(fetchReducer, {
+      data: null,
+      loading: false,
+      error: false
+    });
+  
+    const fetch = async (variables?: TVariables) => {
+      try {
+        dispatch({ type: "FETCH" });
+  
+        const { data, errors } = await server.fetch<TData, TVariables>({
+          query,
+          variables
+        });
+  
+        if (errors && errors.length) {
+          throw new Error(errors[0].message);
+        }
+  
+        dispatch({ type: "FETCH_SUCCESS", payload: data });
+      } catch (err) {
+        dispatch({ type: "FETCH_ERROR" });
+        throw console.error(err);
+      }
+    };
+  
+    return [fetch, state];
+  };
