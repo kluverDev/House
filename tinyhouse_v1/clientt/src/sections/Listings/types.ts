@@ -20,3 +20,8 @@ export interface Listing {
   export interface DeleteListingVariables {
     id: string;
   }
+  //For the Apollo code generator to pick up the GraphQL documents
+  // and make static types that reference them, it requires us 
+  //to **name all our GraphQL requests**. If we attempt to run our 
+  //static type generation command without naming our documents, Apollo 
+  //Codegen will throw an error.
