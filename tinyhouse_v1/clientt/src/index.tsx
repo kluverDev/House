@@ -2,6 +2,8 @@ import React from "react";
 import { render } from "react-dom";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
+import "./styles/index.css";
+
 
 import { Listings } from "./sections";
 import reportWebVitals from "./reportWebVitals";
