@@ -1,5 +1,5 @@
 {
-  "name": "clientt",
+  "name": "tinyhouse-clientt",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
