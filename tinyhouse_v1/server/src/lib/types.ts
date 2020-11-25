@@ -17,9 +17,13 @@ export interface Listing {
   admin: string;
   city: string;
   bookings: ObjectId[];
+  bookingsIndex: BookingsIndex;
+  price: number;
+  numOfGuests: number;
+
 }
 export interface User {
-  _id: ObjectId;
+  _id: string;
   token: string;
   name: string;
   avatar: string;
