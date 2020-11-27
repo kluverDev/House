@@ -2,18 +2,28 @@ import React from "react";
 import { render } from "react-dom";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
-import { Home, Host, Listing, Listings, NotFound, User } from "./sections";
+import {
+  Home,
+  Host,
+  Listing,
+  Listings,
+  NotFound,
+  User,
+  Login,
+} from "./sections";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./styles/index.css";
-
-
+import { Layout } from "antd";
 
 import reportWebVitals from "./reportWebVitals";
 
 const App = () => {
   return (
     <Router>
+      <Layout id="app">
+
       <Switch>
+        <Route exact path="/login" component={Login} />
         <Route exact path="/" component={Home} />
         <Route exact path="/host" component={Host} />
         <Route exact path="/listing/:id" component={Listing} />
@@ -21,21 +31,22 @@ const App = () => {
         <Route exact path="/user/:id" component={User} />
         <Route component={NotFound} />
       </Switch>
+      </Layout >
     </Router>
+
   );
 };
 
 const client = new ApolloClient({
-    uri: "/api"
-  });
- 
-  
-  render(
-    <ApolloProvider client={client}>
-      <App />
-    </ApolloProvider>,
-    document.getElementById("root")
-  );
+  uri: "/api",
+});
+
+render(
+  <ApolloProvider client={client}>
+    <App />
+  </ApolloProvider>,
+  document.getElementById("root")
+);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

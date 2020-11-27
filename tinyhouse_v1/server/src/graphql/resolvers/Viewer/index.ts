@@ -127,13 +127,13 @@ export const viewerResolvers: IResolvers = {
         throw new Error(`Failed to log out: ${error}`);
       }
     },
-    Viewer: {
-      id: (viewer: Viewer): string | undefined => {
-        return viewer._id;
-      },
-      hasWallet: (viewer: Viewer): boolean | undefined => {
-        return viewer.walletId ? true : undefined;
-      },
+  },
+  Viewer: {
+    id: (viewer: Viewer): string | undefined => {
+      return viewer._id;
+    },
+    hasWallet: (viewer: Viewer): boolean | undefined => {
+      return viewer.walletId ? true : undefined;
     },
   },
 };
