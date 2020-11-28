@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+
 import { render } from "react-dom";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
@@ -14,26 +15,42 @@ import {
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./styles/index.css";
 import { Layout } from "antd";
-
+import { Viewer } from "./lib/types";
 import reportWebVitals from "./reportWebVitals";
 
+const initialViewer: Viewer = {
+  id: null,
+  token: null,
+  avatar: null,
+  hasWallet: null,
+  didRequest: false,
+};
+
 const App = () => {
+  const [viewer, setViewer] = useState<Viewer>(initialViewer);
+
+  console.log("in app");
+  if (viewer.id) {
+    console.log("i win");
+  }
   return (
     <Router>
       <Layout id="app">
-
-      <Switch>
-        <Route exact path="/login" component={Login} />
-        <Route exact path="/" component={Home} />
-        <Route exact path="/host" component={Host} />
-        <Route exact path="/listing/:id" component={Listing} />
-        <Route exact path="/listings/:location?" component={Listings} />
-        <Route exact path="/user/:id" component={User} />
-        <Route component={NotFound} />
-      </Switch>
-      </Layout >
+        <Switch>
+          <Route
+            exact
+            path="/login"
+            render={(props) => <Login {...props} setViewer={setViewer} />}
+          />
+          <Route exact path="/" component={Home} />
+          <Route exact path="/host" component={Host} />
+          <Route exact path="/listing/:id" component={Listing} />
+          <Route exact path="/listings/:location?" component={Listings} />
+          <Route exact path="/user/:id" component={User} />
+          <Route component={NotFound} />
+        </Switch>
+      </Layout>
     </Router>
-
   );
 };
 
