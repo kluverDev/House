@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import { render } from "react-dom";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
@@ -16,7 +15,10 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./styles/index.css";
 import { Layout } from "antd";
 import { Viewer } from "./lib/types";
+import {AppHeader} from "./sections/AppHeader"
 import reportWebVitals from "./reportWebVitals";
+import { Affix } from "antd";
+
 
 const initialViewer: Viewer = {
   id: null,
@@ -31,10 +33,14 @@ const App = () => {
 
   console.log("in app");
   if (viewer.id) {
-    console.log("i win");
+    console.log("i win.viewer id is available");
   }
   return (
     <Router>
+      <Affix offsetTop={0} className="app__affix-header">
+        <AppHeader  viewer={viewer} setViewer={setViewer}/>
+      </Affix>
+
       <Layout id="app">
         <Switch>
           <Route
