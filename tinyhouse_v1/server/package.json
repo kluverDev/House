@@ -2,8 +2,11 @@
   "name": "tinyhouse_server",
   "version": "0.1.0",
   "dependencies": {
+    "@types/cookie-parser": "^1.4.2",
+    "D": "^1.0.0",
     "apollo-server-express": "^2.18.2",
     "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "googleapis": "^65.0.0",
     "graphql": "^15.3.0",
