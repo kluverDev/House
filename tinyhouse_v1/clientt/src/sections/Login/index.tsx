@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Redirect } from "react-router-dom";
 import { useApolloClient, useMutation } from "@apollo/react-hooks";
-import { Card, Layout, Typography , Spin} from "antd";
+import { Card, Layout, Typography, Spin } from "antd";
 import { Viewer } from "../../lib/types";
 import { AUTH_URL } from "../../lib/graphql/queries";
 import { LOG_IN } from "../../lib/graphql/mutations";
@@ -10,9 +10,11 @@ import {
   LogIn as LogInData,
   LogInVariables,
 } from "../../lib/graphql/mutations/LogIn/__generated__/LogIn";
-import { displaySuccessNotification, displayErrorMessage } from "../../lib/utils";
+import {
+  displaySuccessNotification,
+  displayErrorMessage,
+} from "../../lib/utils";
 import { ErrorBanner } from "../../lib/components";
-
 
 import googleLogo from "./assets/google_logo.jpg";
 
@@ -30,8 +32,9 @@ export const Login = ({ setViewer }: Props) => {
     { data: logInData, loading: logInLoading, error: logInError },
   ] = useMutation<LogInData, LogInVariables>(LOG_IN, {
     onCompleted: (data) => {
-      if (data && data.logIn) {
+      if (data && data.logIn && data.logIn.token) {
         setViewer(data.logIn);
+        sessionStorage.setItem("token", data.logIn.token);
         displaySuccessNotification("You've successfully logged in!");
       }
     },
@@ -44,7 +47,9 @@ export const Login = ({ setViewer }: Props) => {
       });
       window.location.href = data.authUrl; //redirecting our app to the url from google
     } catch {
-      displayErrorMessage("Sorry! We weren't able to log you in. Please try again later!");
+      displayErrorMessage(
+        "Sorry! We weren't able to log you in. Please try again later!"
+      );
     }
   };
   const logInRef = useRef(logIn);

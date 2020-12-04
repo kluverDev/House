@@ -38,6 +38,11 @@ const App = () => {
     onCompleted: (data) => {
       if (data && data.logIn) {
         setViewer(data.logIn);
+        if (data.logIn.token) {
+          sessionStorage.setItem("token", data.logIn.token);
+        } else {
+          sessionStorage.removeItem("token");
+        }
       }
     },
   });
@@ -95,6 +100,14 @@ const App = () => {
 
 const client = new ApolloClient({
   uri: "/api",
+  request: async (operation) => {
+    const token = sessionStorage.getItem("token");
+    operation.setContext({
+      headers: {
+        "X-CSRF-TOKEN": token || "",
+      },
+    });
+  },
 });
 
 render(
@@ -108,3 +121,5 @@ render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+//That's all we'll do for now. For every request made in our app, the `X-CSRF-TOKEN` will now be passed to our server as a header property. In our server, when we run the `authorize()` function, we'll check to see if the viewer can be found with this token in our database. In resolver functions where we want to verify that the request is coming from a valid viewer, we'll obtain the `viewer` information from the `authorize()` function and allow the request to query or manipulate sensitive information in our app.
