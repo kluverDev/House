@@ -40,6 +40,8 @@ export interface User {
   income: number;
   bookings: ObjectId[];
   listings: ObjectId[];
+  authorized?: boolean;
+
 }
 //`token` field to store the user's login session token
 //walletid is optional and refers to a users payment details

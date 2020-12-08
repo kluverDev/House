@@ -35,6 +35,7 @@ export const typeDefs = gql`
   type Bookings {
     total: Int!
     result: [Booking!]!
+    
   }
 
   type Listings {
