@@ -1,10 +1,16 @@
 import { IResolvers } from "apollo-server-express";
-import { Database, Listing, User } from "../../../lib/types";
-import { ListingArgs, ListingBookingsArgs, ListingBookingsData } from "./types";
-
-import { ObjectId } from "mongodb";
-import { authorize } from "../../../lib/utils";
 import { Request } from "express";
+import { ObjectId } from "mongodb";
+import { Database, Listing, User } from "../../../lib/types";
+import { authorize } from "../../../lib/utils";
+import {
+  ListingArgs,
+  ListingBookingsArgs,
+  ListingBookingsData,
+  ListingsArgs,
+  ListingsData,
+  ListingsFilter
+} from "./types";
 
 export const listingResolvers: IResolvers = {
   Query: {
@@ -29,9 +35,38 @@ export const listingResolvers: IResolvers = {
         throw new Error(`Failed to query listing: ${error}`);
       }
     },
-    listings: () => {
-      return "Query.listings";
-    },
+    listings: async (
+      _root: undefined,
+      { filter, limit, page }: ListingsArgs,
+      { db }: { db: Database }
+    ): Promise<ListingsData> => {
+      try {
+        const data: ListingsData = {
+          total: 0,
+          result: []
+        };
+
+        let cursor = await db.listings.find({});
+
+        if (filter && filter === ListingsFilter.PRICE_LOW_TO_HIGH) {
+          cursor = cursor.sort({ price: 1 });
+        }
+
+        if (filter && filter === ListingsFilter.PRICE_HIGH_TO_LOW) {
+          cursor = cursor.sort({ price: -1 });
+        }
+
+        cursor = cursor.skip(page > 0 ? (page - 1) * limit : 0);
+        cursor = cursor.limit(limit);
+
+        data.total = await cursor.count();
+        data.result = await cursor.toArray();
+
+        return data;
+      } catch (error) {
+        throw new Error(`Failed to query listings: ${error}`);
+      }
+    }
   },
   Listing: {
     id: (listing: Listing): string => {
@@ -63,11 +98,11 @@ export const listingResolvers: IResolvers = {
 
         const data: ListingBookingsData = {
           total: 0,
-          result: [],
+          result: []
         };
 
         let cursor = await db.bookings.find({
-          _id: { $in: listing.bookings },
+          _id: { $in: listing.bookings }
         });
 
         cursor = cursor.skip(page > 0 ? (page - 1) * limit : 0);
@@ -80,6 +115,6 @@ export const listingResolvers: IResolvers = {
       } catch (error) {
         throw new Error(`Failed to query listing bookings: ${error}`);
       }
-    },
-  },
+    }
+  }
 };
