@@ -4,13 +4,15 @@ import { ObjectId } from "mongodb";
 import { Database, Listing, User } from "../../../lib/types";
 import { authorize } from "../../../lib/utils";
 import {
+  ListingsQuery,
   ListingArgs,
   ListingBookingsArgs,
   ListingBookingsData,
   ListingsArgs,
   ListingsData,
-  ListingsFilter
+  ListingsFilter,
 } from "./types";
+import { Google } from "../../../lib/api";
 
 export const listingResolvers: IResolvers = {
   Query: {
@@ -37,16 +39,32 @@ export const listingResolvers: IResolvers = {
     },
     listings: async (
       _root: undefined,
-      { filter, limit, page }: ListingsArgs,
+      { location, filter, limit, page }: ListingsArgs,
       { db }: { db: Database }
     ): Promise<ListingsData> => {
+      const query: ListingsQuery = {};
+
       try {
         const data: ListingsData = {
+          region: null,
           total: 0,
-          result: []
+          result: [],
         };
+        if (location) {
+          const { country, admin, city } = await Google.geocode(location);
 
-        let cursor = await db.listings.find({});
+          if (city) query.city = city;
+          if (admin) query.admin = admin;
+          if (country) {
+            query.country = country;
+          } else {
+            throw new Error("no country found");
+          }
+          const cityText = city ? `${city}, ` : "";
+          const adminText = admin ? `${admin}, ` : "";
+          data.region = `${cityText}${adminText}${country}`;
+        }
+        let cursor = await db.listings.find(query);
 
         if (filter && filter === ListingsFilter.PRICE_LOW_TO_HIGH) {
           cursor = cursor.sort({ price: 1 });
@@ -66,7 +84,7 @@ export const listingResolvers: IResolvers = {
       } catch (error) {
         throw new Error(`Failed to query listings: ${error}`);
       }
-    }
+    },
   },
   Listing: {
     id: (listing: Listing): string => {
@@ -98,11 +116,11 @@ export const listingResolvers: IResolvers = {
 
         const data: ListingBookingsData = {
           total: 0,
-          result: []
+          result: [],
         };
 
         let cursor = await db.bookings.find({
-          _id: { $in: listing.bookings }
+          _id: { $in: listing.bookings },
         });
 
         cursor = cursor.skip(page > 0 ? (page - 1) * limit : 0);
@@ -115,6 +133,6 @@ export const listingResolvers: IResolvers = {
       } catch (error) {
         throw new Error(`Failed to query listing bookings: ${error}`);
       }
-    }
-  }
+    },
+  },
 };

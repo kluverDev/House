@@ -1,8 +1,36 @@
 //this file stores the methods we'll create that connect with Google's APIs.
 import { google } from "googleapis";
+import { createClient, AddressComponent } from "@google/maps";
+
+const maps = createClient({ key: `${process.env.G_GEOCODE_KEY}`, Promise });
+
+const parseAddress = (addressComponents: AddressComponent[]) => {
+  let country = null;
+  let admin = null;
+  let city = null;
+
+  for (const component of addressComponents) {
+    if (component.types.includes("country")) {
+      country = component.long_name;
+    }
+
+    if (component.types.includes("administrative_area_level_1")) {
+      admin = component.long_name;
+    }
+
+    if (
+      component.types.includes("locality") ||
+      component.types.includes("postal_town")
+    ) {
+      city = component.long_name;
+    }
+  }
+
+  return { country, admin, city };
+};
 
 //we need the auth object to generate an authentication URL for a consent
-// form or use Google's **People API** to get information for a certain user. 
+// form or use Google's **People API** to get information for a certain user.
 const auth = new google.auth.OAuth2(
   process.env.G_CLIENT_ID,
   process.env.G_CLIENT_SECRET,
@@ -10,6 +38,15 @@ const auth = new google.auth.OAuth2(
 );
 
 export const Google = {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  geocode: async (address: string) => {
+    const res = await maps.geocode({ address }).asPromise();
+
+    if (res.status < 200 || res.status > 299) {
+      throw new Error("failed to geocode address");
+    }
+    return parseAddress(res.json.results[0].address_components);
+  },
   authUrl: auth.generateAuthUrl({
     access_type: "online",
     scope: [
@@ -23,11 +60,11 @@ export const Google = {
     const { tokens } = await auth.getToken(code);
     auth.setCredentials(tokens);
     const { data } = await google.people({ version: "v1", auth }).people.get({
-        resourceName: "people/me",
-        personFields: "emailAddresses,names,photos"
-      });
-  
-      return { user: data };
+      resourceName: "people/me",
+      personFields: "emailAddresses,names,photos",
+    });
+
+    return { user: data };
   },
 };
 
